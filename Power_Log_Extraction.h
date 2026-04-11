@@ -5,15 +5,8 @@
 #ifndef UGMFGT_15_1_JWESTING_P_FACTOR_ANALYSER_POWER_LOG_EXTRACTION_H
 #define UGMFGT_15_1_JWESTING_P_FACTOR_ANALYSER_POWER_LOG_EXTRACTION_H
 
-typedef struct {
-    double timestamp;
-    double phaseA;
-    double phaseB;
-    double phaseC;
-    double lineCurrent;
-    double frequency;
-    double powerFactor;
-    double thd;
-} Power_Log;
+#include "Power_Log_StructDef.h"
+
+int parse_powerlog_line(const char *line, Power_Log *out);
 
 #endif //UGMFGT_15_1_JWESTING_P_FACTOR_ANALYSER_POWER_LOG_EXTRACTION_H
