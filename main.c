@@ -1,46 +1,95 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "Power_Log_Extraction.h"
 #include "Power_Log_StructDef.h"
 
 int main(void) {
-    // open the CSV file
+
+    // ---------- Count data rows in csv file -----------------------------------
+
+    // open the file to count rows
     FILE *fp = fopen("C:/Users/joewe/OneDrive - UWE Bristol/Year 2.1/Programming for Engineers/Coursework - Power Factor Analyser/untitled/cmake-build-debug/power_quality_log.csv", "r");
 
-    // error logging for open failure
+    // check if the file opened correctly
     if (!fp) {
         printf("could not open file\n");
         return 1;
     }
 
-    // buffer for reading lines
     char line[512];
 
-    // skip the header row
+    // skip the header
     fgets(line, sizeof(line), fp);
 
-    // struct to hold parsed data
-    Power_Log row;
+    int rowCount = 0;
 
-    // read each remaining line
+    // count each data row
+    while (fgets(line, sizeof(line), fp)) {
+        rowCount++;
+    }
+
+    // close the file after counting
+    fclose(fp);
+
+    // ---------- Allocate Memory ------------------------------------------------
+
+    // allocate an array of Power_Log structs
+    Power_Log *logs = malloc(rowCount * sizeof(Power_Log));
+
+    // check if malloc failed
+    if (!logs) {
+        printf("memory allocation failed\n");
+        return 1;
+    }
+
+    // ---------- Extract data using pointer arithmetic --------------------------
+
+    // reopen the file to read data
+    fp = fopen("C:/Users/joewe/OneDrive - UWE Bristol/Year 2.1/Programming for Engineers/Coursework - Power Factor Analyser/untitled/cmake-build-debug/power_quality_log.csv", "r");
+
+    // skip the header again
+    fgets(line, sizeof(line), fp);
+
+    // point to the first struct in the array
+    Power_Log *p = logs;
+
+    // read each row into the array
     while (fgets(line, sizeof(line), fp)) {
 
-        // parse the CSV line into the struct
-        if (parse_powerlog_line(line, &row)) {
+        // parse the line into the struct pointed to by p
+        if (parse_powerlog_line(line, p)) {
 
-            // print all fields in the struct
-            printf("%f, %f, %f, %f, %f, %f, %f, %f\n",
-        row.timestamp,
-        row.phaseA,
-        row.phaseB,
-        row.phaseC,
-        row.lineCurrent,
-        row.frequency,
-        row.powerFactor,
-        row.thd);
+            // move the pointer to the next struct
+            p++;
         }
     }
 
-    // close the file
     fclose(fp);
+
+    // ---------- Print data using pointer arithmetic ---------------------------
+
+
+    Power_Log *q = logs;
+
+    for (int i = 0; i < rowCount; i++) {
+
+        printf("%f, %f, %f, %f, %f, %f, %f, %f\n",
+               q->timestamp,
+               q->phaseA,
+               q->phaseB,
+               q->phaseC,
+               q->lineCurrent,
+               q->frequency,
+               q->powerFactor,
+               q->thd);
+
+        q++;   // moving to the next struct
+    }
+
+    // ---------- Free memory ----------------------------------------------------
+
+    free(logs);
+
     return 0;
 }
+
