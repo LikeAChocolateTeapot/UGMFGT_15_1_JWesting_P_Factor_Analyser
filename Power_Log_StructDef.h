@@ -5,6 +5,7 @@
 #ifndef UGMFGT_15_1_JWESTING_P_FACTOR_ANALYSER_POWER_LOG_STRUCTDEF_H
 #define UGMFGT_15_1_JWESTING_P_FACTOR_ANALYSER_POWER_LOG_STRUCTDEF_H
 
+// define the struct for storing Power_Log data
 typedef struct {
     double timestamp;
     double phaseA;
