@@ -1,11 +1,6 @@
-//
-// Created by joewe on 11/04/2026.
-//
+#ifndef POWER_LOG_STRUCTDEF_H
+#define POWER_LOG_STRUCTDEF_H
 
-#ifndef UGMFGT_15_1_JWESTING_P_FACTOR_ANALYSER_POWER_LOG_STRUCTDEF_H
-#define UGMFGT_15_1_JWESTING_P_FACTOR_ANALYSER_POWER_LOG_STRUCTDEF_H
-
-// define the struct for storing Power_Log data
 typedef struct {
     double timestamp;
     double phaseA;
@@ -17,4 +12,4 @@ typedef struct {
     double thd;
 } Power_Log;
 
-#endif //UGMFGT_15_1_JWESTING_P_FACTOR_ANALYSER_POWER_LOG_STRUCTDEF_H
+#endif

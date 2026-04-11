@@ -9,9 +9,7 @@
 // parse one CSV line into a Power_Log struct
 static inline int parse_powerlog_line(const char *line, Power_Log *out)
 {
-    // use sscanf to extract 8 comma‑separated values from the line
-    // write each value into the matching field of the struct
-    // return 1 if all 8 values were read successfully, otherwise 0
+    // use sscanf to extract 8 comma‑separated values
     return sscanf(line, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf",
                   &out->timestamp,
                   &out->phaseA,

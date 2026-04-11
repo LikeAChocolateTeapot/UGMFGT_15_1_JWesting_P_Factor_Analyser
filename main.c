@@ -1,16 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "Power_Log_Extraction.h"
 #include "Power_Log_StructDef.h"
+#include "Compute_RMS.h"
 
-int main(void) {
+#define NOMINAL_VOLTAGE 230.0
 
-    // ---------- Count data rows in csv file -----------------------------------
+int main(void)
+{
+    const char *filepath =
+        "C:/Users/joewe/OneDrive - UWE Bristol/Year 2.1/Programming for Engineers/"
+        "Coursework - Power Factor Analyser/untitled/cmake-build-debug/power_quality_log.csv";
 
-    // open the file to count rows
-    FILE *fp = fopen("C:/Users/joewe/OneDrive - UWE Bristol/Year 2.1/Programming for Engineers/Coursework - Power Factor Analyser/untitled/cmake-build-debug/power_quality_log.csv", "r");
+    // ---------- Open file ----------
+    FILE *fp = fopen(filepath, "r");
 
-    // check if the file opened correctly
     if (!fp) {
         printf("could not open file\n");
         return 1;
@@ -18,61 +23,51 @@ int main(void) {
 
     char line[512];
 
-    // skip the header
-    fgets(line, sizeof(line), fp);
+    // ---------- Count rows ----------
+    fgets(line, sizeof(line), fp); // skip header
 
     int rowCount = 0;
 
-    // count each data row
     while (fgets(line, sizeof(line), fp)) {
         rowCount++;
     }
 
-    // close the file after counting
     fclose(fp);
 
-    // ---------- Allocate Memory ------------------------------------------------
-
-    // allocate an array of Power_Log structs
+    // ---------- Allocate memory ----------
     Power_Log *logs = malloc(rowCount * sizeof(Power_Log));
 
-    // check if malloc failed
     if (!logs) {
         printf("memory allocation failed\n");
         return 1;
     }
 
-    // ---------- Extract data using pointer arithmetic --------------------------
+    // ---------- Read data ----------
+    fp = fopen(filepath, "r");
 
-    // reopen the file to read data
-    fp = fopen("C:/Users/joewe/OneDrive - UWE Bristol/Year 2.1/Programming for Engineers/Coursework - Power Factor Analyser/untitled/cmake-build-debug/power_quality_log.csv", "r");
+    if (!fp) {
+        printf("could not reopen file\n");
+        free(logs);
+        return 1;
+    }
 
-    // skip the header again
-    fgets(line, sizeof(line), fp);
+    fgets(line, sizeof(line), fp); // skip header
 
-    // point to the first struct in the array
     Power_Log *p = logs;
 
-    // read each row into the array
     while (fgets(line, sizeof(line), fp)) {
 
-        // parse the line into the struct pointed to by p by using Power_Log_Extraction.h
-        if (parse_powerlog_line(line, p)) {
+        parse_powerlog_line(line, p);
 
-            // move the pointer to the next struct
-            p++;
-        }
+        p++;   // original pointer-style loop
     }
 
     fclose(fp);
 
-    // ---------- Print data using pointer arithmetic ---------------------------
-
-
+    // ---------- Print raw data ----------
     Power_Log *q = logs;
 
     for (int i = 0; i < rowCount; i++) {
-
         printf("%f, %f, %f, %f, %f, %f, %f, %f\n",
                q->timestamp,
                q->phaseA,
@@ -83,13 +78,28 @@ int main(void) {
                q->powerFactor,
                q->thd);
 
-        q++;   // moving to the next struct
+        q++;
     }
 
-    // ---------- Free memory ----------------------------------------------------
+    // ---------- RMS calculations ----------
+    double rmsA = compute_rms(logs, rowCount, get_phaseA);
+    double rmsB = compute_rms(logs, rowCount, get_phaseB);
+    double rmsC = compute_rms(logs, rowCount, get_phaseC);
 
+    // ---------- Output ----------
+    printf("\n=== RMS SUMMARY ===\n");
+
+    printf("Phase A RMS: %.2f V (%.4f%%)\n",
+           rmsA, rms_percent_error(rmsA, NOMINAL_VOLTAGE));
+
+    printf("Phase B RMS: %.2f V (%.4f%%)\n",
+           rmsB, rms_percent_error(rmsB, NOMINAL_VOLTAGE));
+
+    printf("Phase C RMS: %.2f V (%.4f%%)\n",
+           rmsC, rms_percent_error(rmsC, NOMINAL_VOLTAGE));
+
+    // ---------- Cleanup ----------
     free(logs);
 
     return 0;
 }
-
