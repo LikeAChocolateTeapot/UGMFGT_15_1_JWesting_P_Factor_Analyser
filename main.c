@@ -56,7 +56,7 @@ int main(void) {
     // read each row into the array
     while (fgets(line, sizeof(line), fp)) {
 
-        // parse the line into the struct pointed to by p
+        // parse the line into the struct pointed to by p by using Power_Log_Extraction.h
         if (parse_powerlog_line(line, p)) {
 
             // move the pointer to the next struct
