@@ -26,15 +26,15 @@ double compute_rms(const Power_Log *logs, size_t count, extract_fn extractor)
 }
 
 double get_phaseA(const Power_Log *entry) {
-    printf("A called\n");
+    //printf("A called\n");
     return entry->phaseA;
 }
 double get_phaseB(const Power_Log *entry) {
-    printf("B called\n");
+    //printf("B called\n");
     return entry->phaseB;
 }
 double get_phaseC(const Power_Log *entry) {
-    printf("C called\n");
+    //printf("C called\n");
     return entry->phaseC;
 }
 

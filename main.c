@@ -3,6 +3,8 @@
 
 #include "io.h"
 #include "Compute_RMS.h"
+#include "Compute_P2P.h"
+#include "Compute_Offset.h"
 
 #define NOMINAL_VOLTAGE 230.0
 
@@ -44,6 +46,13 @@ int main(void)
     double rmsB = compute_rms(logs, rowCount, get_phaseB);
     double rmsC = compute_rms(logs, rowCount, get_phaseC);
 
+       // ---------- P2P calculations ----------
+       // Compute peak-to-peak values
+       P2P_Result p2p = compute_p2p(logs, rowCount);
+
+    // ---------- DC Offset calculations ----------
+    Offset_Result offset = compute_offset(logs, rowCount);
+
     // ---------- Output ----------
     printf("\n=== RMS SUMMARY ===\n");
 
@@ -53,8 +62,20 @@ int main(void)
     printf("Phase B RMS: %.2f V (%.4f%%)\n",
            rmsB, rms_percent_error(rmsB, NOMINAL_VOLTAGE));
 
-    printf("Phase C RMS: %.2f V (%.4f%%)\n",
+    printf("Phase C RMS: %.2f V (%.4f%%)\n\n",
            rmsC, rms_percent_error(rmsC, NOMINAL_VOLTAGE));
+
+       printf("\n=== PEAK TO PEAK SUMMARY ===\n");
+    printf("P2P Phase A: %f V\n", p2p.p2p_phaseA);
+    printf("P2P Phase B: %f V\n", p2p.p2p_phaseB);
+    printf("P2P Phase C: %f V\n", p2p.p2p_phaseC);
+    printf("P2P Current : %f A\n", p2p.p2p_current);
+
+    printf("\n=== DC OFFSET SUMMARY ===\n");
+    printf("DC A: %f\n", offset.dc_phaseA);
+    printf("DC B: %f\n", offset.dc_phaseB);
+    printf("DC C: %f\n", offset.dc_phaseC);
+    printf("DC I: %f\n", offset.dc_current);
 
     // ---------- Cleanup ----------
     free(logs);
