@@ -7,4 +7,6 @@ add_executable(UGMFGT_15_1_JWesting_P_Factor_Analyser main.c
         Power_Log_Extraction.h
         Power_Log_StructDef.h
         Compute_RMS.h
-        Compute_RMS.c)
+        Compute_RMS.c
+        io.h
+        io.c)

@@ -1,68 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Power_Log_Extraction.h"
-#include "Power_Log_StructDef.h"
+#include "io.h"
 #include "Compute_RMS.h"
 
 #define NOMINAL_VOLTAGE 230.0
 
 int main(void)
 {
-    const char *filepath =
-        "C:/Users/joewe/OneDrive - UWE Bristol/Year 2.1/Programming for Engineers/"
-        "Coursework - Power Factor Analyser/untitled/cmake-build-debug/power_quality_log.csv";
+       const char *filepath =
+          "C:/Users/joewe/OneDrive - UWE Bristol/Year 2.1/Programming for Engineers/"
+          "Coursework - Power Factor Analyser/untitled/cmake-build-debug/power_quality_log.csv";
 
-    // ---------- Open file ----------
-    FILE *fp = fopen(filepath, "r");
+       int rowCount = 0;
 
-    if (!fp) {
-        printf("could not open file\n");
-        return 1;
-    }
+       // Load data from CSV
+       Power_Log *logs = load_power_log(filepath, &rowCount);
 
-    char line[512];
-
-    // ---------- Count rows ----------
-    fgets(line, sizeof(line), fp); // skip header
-
-    int rowCount = 0;
-
-    while (fgets(line, sizeof(line), fp)) {
-        rowCount++;
-    }
-
-    fclose(fp);
-
-    // ---------- Allocate memory ----------
-    Power_Log *logs = malloc(rowCount * sizeof(Power_Log));
-
-    if (!logs) {
-        printf("memory allocation failed\n");
-        return 1;
-    }
-
-    // ---------- Read data ----------
-    fp = fopen(filepath, "r");
-
-    if (!fp) {
-        printf("could not reopen file\n");
-        free(logs);
-        return 1;
-    }
-
-    fgets(line, sizeof(line), fp); // skip header
-
-    Power_Log *p = logs;
-
-    while (fgets(line, sizeof(line), fp)) {
-
-        parse_powerlog_line(line, p);
-
-        p++;   // original pointer-style loop
-    }
-
-    fclose(fp);
+       // Check if loading failed
+       if (!logs) {
+              return 1;
+       }
 
     // ---------- Print raw data ----------
     Power_Log *q = logs;

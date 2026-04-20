@@ -2,7 +2,7 @@
 #define COMPUTE_RMS_H
 
 #include <stddef.h>
-#include "power_log_structdef.h"
+#include "io.h"
 
 // Function pointer type
 typedef double (*extract_fn)(const Power_Log *entry);
