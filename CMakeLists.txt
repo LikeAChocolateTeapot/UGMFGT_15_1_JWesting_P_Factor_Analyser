@@ -10,6 +10,8 @@ add_executable(UGMFGT_15_1_JWesting_P_Factor_Analyser
     Waveform_Analysis/Compute_Offset.c
     IO_And_Logs/io.c
     IO_And_Logs/Power_Log_Extractor.c
+        Waveform_Analysis/clip_detection.c
+        Waveform_Analysis/clip_detection.h
 )
 
 target_include_directories(UGMFGT_15_1_JWesting_P_Factor_Analyser PRIVATE

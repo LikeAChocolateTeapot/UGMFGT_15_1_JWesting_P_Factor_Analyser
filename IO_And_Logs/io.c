@@ -75,7 +75,7 @@ static void read_logs(FILE *fp, Power_Log *logs) {
 }
 
 // Main function to load CSV data into memory
-// Combines file opening, counting, allocation, and reading
+// Does file opening, counting, allocation, and reading
 Power_Log* load_power_log(const char *filepath, int *rowCount) {
 
     // First pass: open file and count rows
@@ -109,43 +109,111 @@ int export_results(
     const char *filename,
     RMS_Result rms,
     P2P_Result p2p,
-    Offset_Result offset
+    Offset_Result offset,
+    Power_Log *logs,
+    int rowCount,
+    int A_ok,
+    int B_ok,
+    int C_ok
 ) {
-
     FILE *fp = fopen(filename, "w");
 
     if (!fp) {
         printf("Failed to open output file\n");
-        return 0; // failure
+        return 0;
     }
 
     fprintf(fp, "=== Power Analysis Report ===\n\n");
 
+    /* ---------------- RMS ---------------- */
     fprintf(fp, "--- RMS Values ---\n");
     fprintf(fp, "Phase A RMS: %f\n", rms.rms_phaseA);
     fprintf(fp, "Phase B RMS: %f\n", rms.rms_phaseB);
     fprintf(fp, "Phase C RMS: %f\n", rms.rms_phaseC);
     fprintf(fp, "Current RMS : %f\n\n", rms.rms_current);
 
+    /* ---------------- P2P ---------------- */
     fprintf(fp, "--- Peak-to-Peak ---\n");
     fprintf(fp, "Phase A P2P: %f\n", p2p.p2p_phaseA);
     fprintf(fp, "Phase B P2P: %f\n", p2p.p2p_phaseB);
     fprintf(fp, "Phase C P2P: %f\n", p2p.p2p_phaseC);
     fprintf(fp, "Current P2P: %f\n\n", p2p.p2p_current);
 
+    /* ---------------- OFFSET ---------------- */
     fprintf(fp, "--- DC Offset ---\n");
     fprintf(fp, "Phase A Offset: %f\n", offset.dc_phaseA);
     fprintf(fp, "Phase B Offset: %f\n", offset.dc_phaseB);
     fprintf(fp, "Phase C Offset: %f\n", offset.dc_phaseC);
     fprintf(fp, "Current Offset: %f\n\n", offset.dc_current);
 
+    /* ---------------- CLIPPING ---------------- */
+    fprintf(fp, "--- Clip Detection ---\n");
+
+    int clipped_count = 0;
+
+    for (int i = 0; i < rowCount; i++)
+    {
+        if (logs[i].clip_flag)
+            clipped_count++;
+    }
+
+    fprintf(fp, "Sensor limit: |V| >= 324.9 V\n\n");
+    fprintf(fp,
+        "Clip Detection Summary - %d entries at sensor limit.\n\n",
+        clipped_count
+    );
+
+    if (clipped_count == 0)
+    {
+        fprintf(fp, "No clipping detected.\n\n");
+    }
+    else
+    {
+        for (int i = 0; i < rowCount; i++)
+        {
+            if (logs[i].clip_flag)
+            {
+                fprintf(fp,
+                    "t=%.3f s | Va=%.2f V | Vb=%.2f V | Vc=%.2f V\n",
+                    logs[i].timestamp,
+                    logs[i].phaseA,
+                    logs[i].phaseB,
+                    logs[i].phaseC
+                );
+            }
+        }
+
+        fprintf(fp, "\n");
+    }
+
+    /* ---------------- TOLERANCE ---------------- */
+    fprintf(fp, "--- Voltage Tolerance Check (±10%% of 230V) ---\n");
+
+    double lower = 230.0 * 0.9;
+    double upper = 230.0 * 1.1;
+
+    fprintf(fp, "Acceptable Range: %.1f V - %.1f V\n\n", lower, upper);
+
+    fprintf(fp, "Phase A: %.2f V -> %s\n",
+            rms.rms_phaseA,
+            A_ok ? "OK (within tolerance)" : "OUT OF RANGE");
+
+    fprintf(fp, "Phase B: %.2f V -> %s\n",
+            rms.rms_phaseB,
+            B_ok ? "OK (within tolerance)" : "OUT OF RANGE");
+
+    fprintf(fp, "Phase C: %.2f V -> %s\n\n",
+            rms.rms_phaseC,
+            C_ok ? "OK (within tolerance)" : "OUT OF RANGE");
+
+    /* ---------------- END ---------------- */
     fprintf(fp, "=== End of Report ===\n");
 
     fclose(fp);
 
-    printf("Results exported successfully.");
+    printf("Results exported successfully.\n");
 
-    return 1; // success
+    return 1;
 }
 
 // Frees allocated Power_Log array

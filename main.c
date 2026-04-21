@@ -6,14 +6,14 @@
 #include "Compute_P2P.h"
 #include "Compute_Offset.h"
 #include "Power_Log_Extractor.h"
+#include "clip_detection.h"
 
 #define NOMINAL_VOLTAGE 230.0
 
 int main(void)
 {
        const char *filepath =
-          "C:/Users/joewe/OneDrive - UWE Bristol/Year 2.1/Programming for Engineers/"
-          "Coursework - Power Factor Analyser/untitled/cmake-build-debug/power_quality_log.csv";
+       "C:/Users/joewe/OneDrive - UWE Bristol/UGMFGT_15_1_JWesting_P_Factor_Analyser/cmake-build-debug/power_quality_log.csv";
 
        int rowCount = 0;
 
@@ -58,9 +58,27 @@ int main(void)
     // ---------- DC Offset calculations ----------
     Offset_Result offset = compute_offset(logs, rowCount);
 
+    // ---------- Clip Detection ----------
+    apply_clipping_flags(logs, rowCount);
+
+    // ---------- Percent Tolerance ----------
+    int A_ok = within_tolerance(rmsA, NOMINAL_VOLTAGE, 10.0);
+    int B_ok = within_tolerance(rmsB, NOMINAL_VOLTAGE, 10.0);
+    int C_ok = within_tolerance(rmsC, NOMINAL_VOLTAGE, 10.0);
+
     // ---------- Output ----------
 
-    export_results("Power_Log_Results.txt", rms, p2p, offset);
+
+    export_results("Power_Log_Results.txt",
+               rms,
+               p2p,
+               offset,
+               logs,
+               rowCount,
+               A_ok,
+               B_ok,
+               C_ok);
+    system("notepad Power_Log_Results.txt");
 
     /*
     printf("\n=== RMS SUMMARY ===\n");

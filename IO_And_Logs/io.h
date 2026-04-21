@@ -14,6 +14,7 @@ typedef struct {
     double frequency;
     double powerFactor;
     double thd;
+    int clip_flag;   // 0 = no clipping, 1 = clipping
 } Power_Log;
 
 typedef struct {
@@ -49,7 +50,12 @@ int export_results(
     const char *filename,
     RMS_Result rms,
     P2P_Result p2p,
-    Offset_Result offset
+    Offset_Result offset,
+    Power_Log *logs,
+    int rowCount,
+    int A_ok,
+    int B_ok,
+    int C_ok
 );
 
 #endif //UGMFGT_15_1_JWESTING_P_FACTOR_ANALYSER_IO_H

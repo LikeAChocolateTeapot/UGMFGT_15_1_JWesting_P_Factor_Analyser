@@ -34,3 +34,11 @@ double rms_percent_error(double rms, double nominal)
 
     return ((rms - nominal) / nominal) * 100.0;
 }
+
+int within_tolerance(double value, double nominal, double percent)
+{
+    double lower = nominal * (1.0 - percent / 100.0);
+    double upper = nominal * (1.0 + percent / 100.0);
+
+    return (value >= lower && value <= upper);
+}
