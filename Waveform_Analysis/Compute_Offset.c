@@ -1,5 +1,7 @@
 #include "stdio.h"
 #include "Compute_Offset.h"
+#include "io.h"
+#include "Power_Log_Extractor.h"
 
 Offset_Result compute_offset(const Power_Log *logs, int count) {
 

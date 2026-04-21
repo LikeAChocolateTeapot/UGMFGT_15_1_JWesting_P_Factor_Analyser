@@ -3,8 +3,9 @@
 //
 
 #include "Compute_P2P.h"
-
 #include <float.h>   // for DBL_MAX / DBL_MIN
+#include "io.h"
+#include "Power_Log_Extractor.h"
 
 P2P_Result compute_p2p(const Power_Log *logs, int count) {
 

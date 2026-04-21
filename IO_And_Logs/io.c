@@ -105,6 +105,49 @@ Power_Log* load_power_log(const char *filepath, int *rowCount) {
     return logs;
 }
 
+int export_results(
+    const char *filename,
+    RMS_Result rms,
+    P2P_Result p2p,
+    Offset_Result offset
+) {
+
+    FILE *fp = fopen(filename, "w");
+
+    if (!fp) {
+        printf("Failed to open output file\n");
+        return 0; // failure
+    }
+
+    fprintf(fp, "=== Power Analysis Report ===\n\n");
+
+    fprintf(fp, "--- RMS Values ---\n");
+    fprintf(fp, "Phase A RMS: %f\n", rms.rms_phaseA);
+    fprintf(fp, "Phase B RMS: %f\n", rms.rms_phaseB);
+    fprintf(fp, "Phase C RMS: %f\n", rms.rms_phaseC);
+    fprintf(fp, "Current RMS : %f\n\n", rms.rms_current);
+
+    fprintf(fp, "--- Peak-to-Peak ---\n");
+    fprintf(fp, "Phase A P2P: %f\n", p2p.p2p_phaseA);
+    fprintf(fp, "Phase B P2P: %f\n", p2p.p2p_phaseB);
+    fprintf(fp, "Phase C P2P: %f\n", p2p.p2p_phaseC);
+    fprintf(fp, "Current P2P: %f\n\n", p2p.p2p_current);
+
+    fprintf(fp, "--- DC Offset ---\n");
+    fprintf(fp, "Phase A Offset: %f\n", offset.dc_phaseA);
+    fprintf(fp, "Phase B Offset: %f\n", offset.dc_phaseB);
+    fprintf(fp, "Phase C Offset: %f\n", offset.dc_phaseC);
+    fprintf(fp, "Current Offset: %f\n\n", offset.dc_current);
+
+    fprintf(fp, "=== End of Report ===\n");
+
+    fclose(fp);
+
+    printf("Results exported successfully.");
+
+    return 1; // success
+}
+
 // Frees allocated Power_Log array
 void free_power_log(Power_Log *logs) {
     free(logs);

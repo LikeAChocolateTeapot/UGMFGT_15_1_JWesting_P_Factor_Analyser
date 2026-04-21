@@ -5,6 +5,7 @@
 #include "Compute_RMS.h"
 #include "Compute_P2P.h"
 #include "Compute_Offset.h"
+#include "Power_Log_Extractor.h"
 
 #define NOMINAL_VOLTAGE 230.0
 
@@ -25,7 +26,8 @@ int main(void)
        }
 
     // ---------- Print raw data ----------
-    Power_Log *q = logs;
+    /*
+       Power_Log *q = logs;
 
     for (int i = 0; i < rowCount; i++) {
         printf("%f, %f, %f, %f, %f, %f, %f, %f\n",
@@ -40,11 +42,14 @@ int main(void)
 
         q++;
     }
-
+*/
     // ---------- RMS calculations ----------
-    double rmsA = compute_rms(logs, rowCount, get_phaseA);
-    double rmsB = compute_rms(logs, rowCount, get_phaseB);
-    double rmsC = compute_rms(logs, rowCount, get_phaseC);
+       double rmsA = compute_rms(logs, rowCount, extract_phaseA);
+       double rmsB = compute_rms(logs, rowCount, extract_phaseB);
+       double rmsC = compute_rms(logs, rowCount, extract_phaseC);
+       double rmsI = compute_rms(logs, rowCount, extract_current);
+
+       RMS_Result rms = {rmsA, rmsB, rmsC, rmsI};
 
        // ---------- P2P calculations ----------
        // Compute peak-to-peak values
@@ -54,6 +59,10 @@ int main(void)
     Offset_Result offset = compute_offset(logs, rowCount);
 
     // ---------- Output ----------
+
+    export_results("Power_Log_Results.txt", rms, p2p, offset);
+
+    /*
     printf("\n=== RMS SUMMARY ===\n");
 
     printf("Phase A RMS: %.2f V (%.4f%%)\n",
@@ -76,6 +85,7 @@ int main(void)
     printf("DC B: %f\n", offset.dc_phaseB);
     printf("DC C: %f\n", offset.dc_phaseC);
     printf("DC I: %f\n", offset.dc_current);
+    */
 
     // ---------- Cleanup ----------
     free(logs);
