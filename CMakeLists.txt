@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 4.1)
 project(UGMFGT_15_1_JWesting_P_Factor_Analyser C)
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 add_executable(UGMFGT_15_1_JWesting_P_Factor_Analyser
     main.c

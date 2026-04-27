@@ -27,5 +27,10 @@ double compute_rms(const Power_Log *logs, size_t count, extract_fn extractor);
 // ------------------------------------
 double rms_percent_error(double rms, double nominal);
 
+// ------------------------------------
+// simple tolerance checker
+// returns 1 if within range, else 0
+// ------------------------------------
+int within_tolerance(double value, double nominal, double tolerance);
 
 #endif

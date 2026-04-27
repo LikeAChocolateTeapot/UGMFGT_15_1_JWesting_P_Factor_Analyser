@@ -13,9 +13,12 @@
 
 int main(void)
 {
-    // filepath to CSV dataset (hardcoded for now, not portable but fine for coursework demo)
-    const char *filepath =
-        "C:/Users/joewe/OneDrive - UWE Bristol/UGMFGT_15_1_JWesting_P_Factor_Analyser/cmake-build-debug/power_quality_log.csv";
+    // filepath to CSV dataset
+    const char filepath[64];
+    printf("Please enter Power Log .csv filepath...\n");
+    scanf("%s", filepath);
+    //printf("%s", filepath);
+    //"../power_quality_log.csv";
 
     int rowCount = 0; // will be set by load function via pointer (output parameter)
 
